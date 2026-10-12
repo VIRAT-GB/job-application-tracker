@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>JobTrack Dashboard</title>
+
+    <!-- Connect our CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Job<span>Track</span>
+        </div>
+
+        <div class="nav-right">
+            <span class="welcome-user">
+                Welcome, {{ current_user.name }}
+            </span>
+
+            <a href="/logout" class="logout-btn">
+                Logout
+            </a>
+        </div>
+
+    </nav>
+
+
+    <!-- ================= MAIN CONTAINER ================= -->
+
+    <main class="container">
+
+        <!-- Page heading -->
+
+        <section class="page-header">
+
+            <div>
+                <h1>Job Application Dashboard</h1>
+
+                <p>
+                    Track your applications, interviews and job search progress.
+                </p>
+            </div>
+
+        </section>
+
+
+        <!-- ================= STATISTICS ================= -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-title">Total Applications</div>
+                <div class="stat-number" id="statTotal">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">Applied</div>
+                <div class="stat-number" id="statApplied">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">Interviews</div>
+                <div class="stat-number" id="statInterview">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">Offers</div>
+                <div class="stat-number" id="statOffer">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">Rejected</div>
+                <div class="stat-number" id="statRejected">0</div>
+            </div>
+
+        </section>
+
+
+        <!-- ================= ADD APPLICATION ================= -->
+
+        <section class="card">
+
+            <div class="section-title">
+                <div>
+                    <h2>Add Application</h2>
+                    <p>Add a new job application to your tracker.</p>
+                </div>
+            </div>
+
+            <form id="addForm" class="application-form">
+
+                <div class="form-group">
+                    <label for="company">Company</label>
+
+                    <input
+                        type="text"
+                        id="company"
+                        placeholder="e.g. Deloitte"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="role">Job Role</label>
+
+                    <input
+                        type="text"
+                        id="role"
+                        placeholder="e.g. Python Developer"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="status">Status</label>
+
+                    <select id="status">
+
+                        {% for s in statuses %}
+
+                            <option value="{{ s }}">
+                                {{ s }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="date_applied">Application Date</label>
+
+                    <input
+                        type="date"
+                        id="date_applied"
+                    >
+                </div>
+
+
+                <div class="form-group notes-group">
+                    <label for="notes">Notes</label>
+
+                    <input
+                        type="text"
+                        id="notes"
+                        placeholder="Optional notes"
+                    >
+                </div>
+
+
+                <div class="form-button">
+                    <button type="submit" class="primary-btn">
+                        + Add Application
+                    </button>
+                </div>
+
+            </form>
+
+            <p id="formError" class="error-message"></p>
+
+        </section>
+
+
+        <!-- ================= APPLICATIONS ================= -->
+
+        <section class="card">
+
+            <div class="section-title">
+
+                <div>
+                    <h2>Your Applications</h2>
+
+                    <p>
+                        Search, filter and manage your job applications.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- Search and filters -->
+
+            <div class="filters">
+
+                <input
+                    type="text"
+                    id="searchBox"
+                    placeholder="Search company..."
+                >
+
+
+                <select id="filterStatus">
+
+                    <option value="All">
+                        All statuses
+                    </option>
+
+                    {% for s in statuses %}
+
+                        <option value="{{ s }}">
+                            {{ s }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+                <select id="sortOrder">
+
+                    <option value="newest">
+                        Newest first
+                    </option>
+
+                    <option value="oldest">
+                        Oldest first
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Applications table -->
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Company</th>
+
+                            <th>Role</th>
+
+                            <th>Status</th>
+
+                            <th>Date</th>
+
+                            <th>Notes</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="tableBody">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        // Get references to important HTML elements.
+
+        const tableBody = document.getElementById('tableBody');
+
+        const searchBox = document.getElementById('searchBox');
+
+        const filterStatus = document.getElementById('filterStatus');
+
+        const sortOrder = document.getElementById('sortOrder');
+
+        const addForm = document.getElementById('addForm');
+
+        const formError = document.getElementById('formError');
+
+
+        // Prevent HTML injection when displaying user data.
+
+        function escapeHtml(text) {
+
+            const div = document.createElement('div');
+
+            div.textContent = text;
+
+            return div.innerHTML;
+
+        }
+
+
+        // Load applications from Flask REST API.
+
+        async function loadApplications() {
+
+            const params = new URLSearchParams({
+
+                status: filterStatus.value,
+
+                sort: sortOrder.value,
+
+                search: searchBox.value
+
+            });
+
+
+            const response = await fetch(
+                '/api/applications?' + params
+            );
+
+
+            const applications = await response.json();
+
+
+            renderTable(applications);
+        }
+
+
+        // Display applications inside the table.
+
+        function renderTable(applications) {
+
+            if (applications.length === 0) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-message">
+                            No applications found.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            let rows = '';
+
+
+            applications.forEach(a => {
+
+                rows += `
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                ${escapeHtml(a.company)}
+                            </strong>
+                        </td>
+
+
+                        <td>
+                            ${escapeHtml(a.role)}
+                        </td>
+
+
+                        <td>
+
+                            <span class="status ${a.status.toLowerCase()}">
+                                ${escapeHtml(a.status)}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+                            ${a.date_applied}
+                        </td>
+
+
+                        <td>
+                            ${escapeHtml(a.notes)}
+                        </td>
+
+
+                        <td class="actions">
+
+                            <button
+                                class="edit-btn"
+                                onclick="editStatus(${a.id}, '${a.status}')"
+                            >
+                                Edit
+                            </button>
+
+
+                            <button
+                                class="delete-btn"
+                                onclick="deleteApplication(${a.id})"
+                            >
+                                Delete
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            });
+
+
+            tableBody.innerHTML = rows;
+        }
+
+
+        // Load dashboard statistics.
+
+        async function loadStats() {
+
+            const response = await fetch('/api/stats');
+
+            const stats = await response.json();
+
+
+            document.getElementById('statTotal').textContent =
+                stats.Total;
+
+            document.getElementById('statApplied').textContent =
+                stats.Applied;
+
+            document.getElementById('statInterview').textContent =
+                stats.Interview;
+
+            document.getElementById('statOffer').textContent =
+                stats.Offer;
+
+            document.getElementById('statRejected').textContent =
+                stats.Rejected;
+        }
+
+
+        // Handle Add Application form.
+
+        addForm.addEventListener('submit', async (e) => {
+
+            e.preventDefault();
+
+            formError.textContent = '';
+
+
+            const payload = {
+
+                company:
+                    document.getElementById('company').value,
+
+                role:
+                    document.getElementById('role').value,
+
+                status:
+                    document.getElementById('status').value,
+
+                date_applied:
+                    document.getElementById('date_applied').value,
+
+                notes:
+                    document.getElementById('notes').value
+
+            };
+
+
+            const response = await fetch(
+                '/api/applications',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify(payload)
+                }
+            );
+
+
+            const data = await response.json();
+
+
+            if (!response.ok) {
+
+                formError.textContent = data.error;
+
+                return;
+            }
+
+
+            // Clear the form after successful submission.
+
+            addForm.reset();
+
+
+            // Refresh applications and statistics.
+
+            loadApplications();
+
+            loadStats();
+
+        });
+
+
+        // Edit application status.
+
+        async function editStatus(id, currentStatus) {
+
+            const newStatus = prompt(
+                'New status (Applied / Interview / Offer / Rejected):',
+                currentStatus
+            );
+
+
+            if (!newStatus || newStatus === currentStatus) {
+
+                return;
+            }
+
+
+            const response = await fetch(
+                `/api/applications/${id}`,
+                {
+                    method: 'PUT',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                }
+            );
+
+
+            if (!response.ok) {
+
+                const data = await response.json();
+
+                alert(data.error);
+
+                return;
+            }
+
+
+            loadApplications();
+
+            loadStats();
+
+        }
+
+
+        // Delete an application.
+
+        async function deleteApplication(id) {
+
+            const confirmed = confirm(
+                'Delete this application?'
+            );
+
+
+            if (!confirmed) {
+
+                return;
+            }
+
+
+            await fetch(
+                `/api/applications/${id}`,
+                {
+                    method: 'DELETE'
+                }
+            );
+
+
+            loadApplications();
+
+            loadStats();
+
+        }
+
+
+        // Reload applications when filters change.
+
+        filterStatus.addEventListener(
+            'change',
+            loadApplications
+        );
+
+
+        sortOrder.addEventListener(
+            'change',
+            loadApplications
+        );
+
+
+        searchBox.addEventListener(
+            'input',
+            loadApplications
+        );
+
+
+        // Load data when dashboard opens.
+
+        loadApplications();
+
+        loadStats();
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>JobTrack - Job Application Tracker</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body class="landing-page">
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="landing-navbar">
+
+        <div class="logo">
+            Job<span>Track</span>
+        </div>
+
+        <div class="landing-nav-links">
+
+            <a href="/login" class="nav-login">
+                Log In
+            </a>
+
+            <a href="/signup" class="nav-signup">
+                Get Started
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= HERO ================= -->
+
+    <main>
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="hero-badge">
+                    Job Application Management
+                </div>
+
+
+                <h1>
+                    Organize your job search.
+                    <span>Land your next opportunity.</span>
+                </h1>
+
+
+                <p>
+                    JobTrack helps you keep all your job applications
+                    in one place. Track applications, interviews,
+                    offers and rejections with a simple dashboard.
+                </p>
+
+
+                <div class="hero-buttons">
+
+                    <a href="/signup" class="hero-primary">
+                        Start Tracking Free →
+                    </a>
+
+                    <a href="/login" class="hero-secondary">
+                        Log In
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- Dashboard preview -->
+
+            <div class="hero-preview">
+
+                <div class="preview-window">
+
+                    <div class="preview-header">
+
+                        <strong>JobTrack</strong>
+
+                        <span>Dashboard</span>
+
+                    </div>
+
+
+                    <div class="preview-stats">
+
+                        <div>
+                            <small>Total</small>
+                            <strong>12</strong>
+                        </div>
+
+                        <div>
+                            <small>Applied</small>
+                            <strong>7</strong>
+                        </div>
+
+                        <div>
+                            <small>Interviews</small>
+                            <strong>3</strong>
+                        </div>
+
+                        <div>
+                            <small>Offers</small>
+                            <strong>1</strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="preview-table">
+
+                        <div class="preview-row preview-heading">
+
+                            <span>Company</span>
+                            <span>Role</span>
+                            <span>Status</span>
+
+                        </div>
+
+
+                        <div class="preview-row">
+
+                            <span>Deloitte</span>
+
+                            <span>Python Developer</span>
+
+                            <span class="preview-status interview">
+                                Interview
+                            </span>
+
+                        </div>
+
+
+                        <div class="preview-row">
+
+                            <span>TCS</span>
+
+                            <span>Software Developer</span>
+
+                            <span class="preview-status applied">
+                                Applied
+                            </span>
+
+                        </div>
+
+
+                        <div class="preview-row">
+
+                            <span>Infosys</span>
+
+                            <span>Backend Developer</span>
+
+                            <span class="preview-status offer">
+                                Offer
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= FEATURES ================= -->
+
+        <section class="features">
+
+            <div class="features-heading">
+
+                <h2>
+                    Everything you need to manage your job search
+                </h2>
+
+                <p>
+                    Stay organized from your first application
+                    to your final offer.
+                </p>
+
+            </div>
+
+
+            <div class="feature-grid">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        ✓
+                    </div>
+
+                    <h3>
+                        Track Applications
+                    </h3>
+
+                    <p>
+                        Keep track of every company and role
+                        you have applied for.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        #
+                    </div>
+
+                    <h3>
+                        Monitor Progress
+                    </h3>
+
+                    <p>
+                        Track applications through Applied,
+                        Interview, Offer and Rejected stages.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        ↗
+                    </div>
+
+                    <h3>
+                        View Your Stats
+                    </h3>
+
+                    <p>
+                        Get a quick overview of your job search
+                        with dashboard statistics.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer class="landing-footer">
+
+        <p>
+            © 2026 JobTrack. Built with Python Flask.
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>
